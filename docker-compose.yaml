@@ -1,0 +1,77 @@
+# docker-compose.yaml
+# https://waha.devlike.pro/docs/how-to/install/
+services:
+  waha:
+    restart: always
+    # For WAHA Core (Free version) - use this image:
+    image: devlikeapro/waha:latest
+
+    # For WAHA Plus (Paid version) - uncomment and use this instead:
+    # image: devlikeapro/waha-plus
+
+    # platform: linux/amd64 # uncomment if you are using mac os ARM
+    container_name: waha
+
+    # # Add DNS if you have problems resolving "web.whatsapp.com"
+    # dns:
+    #   - 1.1.1.1
+    #   - 8.8.8.8
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+    ports:
+      # Bind to localhost only for security
+      - "0.0.0.0:20001:3000/tcp"
+
+    volumes:
+      # Store sessions locally (comment if using MongoDB/PostgreSQL)
+      - "./sessions:/app/.sessions"
+
+      # Save media files between container restarts
+      - "./media:/app/.media"
+
+    env_file:
+      - .env
+
+  # Optional: PostgreSQL for session storage (uncomment if needed)
+  # postgres:
+  #   image: postgres:17
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: postgres
+  #   ports:
+  #     - "127.0.0.1:5432:5432"
+  #   volumes:
+  #     - pg_data:/var/lib/postgresql/data
+  #   command:
+  #     - postgres
+  #     - "-c"
+  #     - "max_connections=3000"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "100m"
+  #       max-file: "10"
+
+  # Optional: MongoDB for session storage (uncomment if needed)
+  # mongodb:
+  #   image: mongo
+  #   container_name: mongodb
+  #   ports:
+  #     - '127.0.0.1:27017:27017/tcp'
+  #   volumes:
+  #     - mongodb_data:/data/db
+  #   environment:
+  #     - MONGO_INITDB_ROOT_USERNAME=mongouser
+  #     - MONGO_INITDB_ROOT_PASSWORD=mongopass
+  #     - MONGO_INITDB_DATABASE=waha
+# Volumes for optional databases
+# volumes:
+#   pg_data:
+#   mongodb_data:
